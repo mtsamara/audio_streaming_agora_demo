@@ -1,10 +1,10 @@
 # audio_streaming_agora_demo
 
-A new Flutter project.
+This is based on [Agora Tutorial](https://www.agora.io/en/blog/building-your-own-audio-streaming-application-using-the-agora-flutter-sdk/)
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+This project is a starting point for an Audio Streaming Flutter application using Agora SDK.
 
 A few resources to get you started if this is your first Flutter project:
 
