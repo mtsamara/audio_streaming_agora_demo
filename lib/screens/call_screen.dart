@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:agora_rtm/agora_rtm.dart';
 import 'package:audio_streaming_agora_demo/widgets/user_view.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +21,7 @@ class CallScreen extends StatefulWidget {
 }
 
 class _CallScreenState extends State<CallScreen> {
-  static const appID = '';
+  static const appID = '<your App ID>';
   static final _users = <int>[];
   final _infoStrings = <String>[];
   bool muted = false;
@@ -143,7 +145,7 @@ class _CallScreenState extends State<CallScreen> {
     _client!.onConnectionStateChanged = (int state, int reason) {
       if (state == 5) {
         _client!.logout();
-        print('Logout.');
+        log('Logout.');
         setState(() {
           _isLogin = false;
         });
@@ -152,25 +154,25 @@ class _CallScreenState extends State<CallScreen> {
 
     String userId = widget.userName;
     await _client!.login(null, userId);
-    print('Login success: ' + userId);
+    log('Login success: ' + userId);
     setState(() {
       _isLogin = true;
     });
     String channelName = widget.channelName;
     _channel = await _createChannel(channelName);
     await _channel!.join();
-    print('RTM Join channel success.');
+    log('RTM Join channel success.');
     setState(() {
       _isInChannel = true;
     });
     await _channel!.sendMessage(AgoraRtmMessage.fromText('$localUid:join'));
     _client!.onMessageReceived = (AgoraRtmMessage message, String peerId) {
-      print("Peer msg: " + peerId + ", msg: " + message.text);
+      log("Peer msg: " + peerId + ", msg: " + message.text);
 
       var userData = message.text.split(':');
 
       if (userData[1] == 'leave') {
-        print('In here');
+        log('In here');
         setState(() {
           _allUsers.remove(int.parse(userData[0]));
         });
@@ -182,8 +184,7 @@ class _CallScreenState extends State<CallScreen> {
     };
     _channel!.onMessageReceived =
         (AgoraRtmMessage message, AgoraRtmMember member) {
-      print(
-          'Outside channel message received : ${message.text} from ${member.userId}');
+      log('Outside channel message received : ${message.text} from ${member.userId}');
 
       var userData = message.text.split(':');
 
@@ -192,8 +193,8 @@ class _CallScreenState extends State<CallScreen> {
           _allUsers.remove(int.parse(userData[0]));
         });
       } else {
-        print('Broadcasters list : $_users');
-        print('All users lists: ${_allUsers.values}');
+        log('Broadcasters list : $_users');
+        log('All users lists: ${_allUsers.values}');
         setState(() {
           _allUsers.putIfAbsent(int.parse(userData[0]), () => member.userId);
         });
@@ -216,7 +217,7 @@ class _CallScreenState extends State<CallScreen> {
   Future<AgoraRtmChannel> _createChannel(String name) async {
     AgoraRtmChannel? channel = await _client!.createChannel(name);
     channel!.onMemberJoined = (AgoraRtmMember member) async {
-      print('Member joined : ${member.userId}');
+      log('Member joined : ${member.userId}');
       // setState(() {
 
       // });
@@ -225,8 +226,8 @@ class _CallScreenState extends State<CallScreen> {
     };
     channel.onMemberLeft = (AgoraRtmMember member) async {
       var reversedMap = _allUsers.map((k, v) => MapEntry(v, k));
-      print('Member left : ${member.userId}:leave');
-      print('Member left : ${reversedMap[member.userId]}:leave');
+      log('Member left : ${member.userId}:leave');
+      log('Member left : ${reversedMap[member.userId]}:leave');
 
       setState(() {
         _allUsers.remove(reversedMap[member.userId]);
@@ -236,7 +237,7 @@ class _CallScreenState extends State<CallScreen> {
     };
     channel.onMessageReceived =
         (AgoraRtmMessage message, AgoraRtmMember member) {
-      print('Channel message received : ${message.text} from ${member.userId}');
+      log('Channel message received : ${message.text} from ${member.userId}');
 
       var userData = message.text.split(':');
 
